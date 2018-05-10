@@ -1,0 +1,36 @@
+# network parameters
+NUM_LABELS: 2 # (background, cosmic, neutrino)
+N_INITIAL_FILTERS:  1
+NETWORK_DEPTH_PRE_MERGE: 3
+NETWORK_DEPTH_POST_MERGE: 3
+RESIDUAL_BLOCKS_PER_LAYER: 1
+NPLANES: 3
+
+# training parameters:
+N_MINIBATCH: 2
+MINIBATCH_SIZE: 1
+SAVE_ITERATION: 500
+REPORT_ITERATION: 1
+SUMMARY_ITERATION: 1
+BALANCE_LOSS:  True
+BASE_LEARNING_RATE:  0.001
+TRAINING: True
+ITERATIONS: 50
+TRAIN_CONFIG:
+    FILE: './config/train_io.cfg'
+    FILLER: 'TrainIO'
+    VERBOSITY: 3
+    KEYWORD_DATA:  'main_data'
+    KEYWORD_LABEL: 'main_label'
+
+# TEST_CONFIG:
+#     FILE: './config_threeplane/test_io.cfg'
+#     FILLER: 'TestIO'
+#     VERBOSITY: 3
+#     KEYWORD_DATA:  'test_data'
+#     KEYWORD_LABEL: 'test_label'
+
+# General parameters:
+LOGDIR: 'log_neutrino_filter/dev'
+RESTORE: False
+GPU: 0
