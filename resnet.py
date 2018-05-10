@@ -41,7 +41,7 @@ class resnet(resnetcore):
 
         # The filters are concatenated at some point, and progress together
 
-        verbose = False
+        verbose = True
 
         if verbose:
             print "Initial shape: " + str(x.get_shape())
@@ -72,22 +72,26 @@ class resnet(resnetcore):
             for p in range(len(x)):
                 print "Plane {0}".format(p) + str(x[p].get_shape())
 
-
-
-
+        for p in xrange(len(x)):
+          x[p] = residual_block(x[p], self._params['TRAINING'],
+                                      batch_norm=True,
+                                      name="initial_resblock1_plane{0}".format(p))
+          x[p] = residual_block(x[p], self._params['TRAINING'],
+                                      batch_norm=True,
+                                      name="initial_resblock2_plane{0}".format(p))
 
         # Begin the process of residual blocks and downsampling:
         for p in xrange(len(x)):
             for i in xrange(self._params['NETWORK_DEPTH_PRE_MERGE']):
 
-                for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
-                    x[p] = residual_block(x[p], self._params['TRAINING'],
-                                          batch_norm=True,
-                                          name="resblock_down_plane{0}_{1}_{2}".format(p, i, j))
-
                 x[p] = downsample_block(x[p], self._params['TRAINING'],
                                         batch_norm=True,
                                         name="downsample_plane{0}_{1}".format(p,i))
+
+                for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
+                    x[p] = residual_block(x[p], self._params['TRAINING'],
+                                          batch_norm=True,
+                                          name="resblock_plane{0}_{1}_{2}".format(p, i, j))
                 if verbose:
                     print "Plane {p}, layer {i}: x[{p}].get_shape(): {s}".format(
                         p=p, i=i, s=x[p].get_shape())
@@ -102,13 +106,14 @@ class resnet(resnetcore):
 
         # At the bottom, do another residual block:
         for i in xrange(self._params['NETWORK_DEPTH_POST_MERGE']):
-            for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
-                x = residual_block(x, self._params['TRAINING'],
-                    batch_norm=True, name="resblock_postmerge_{0}_{1}".format(i, j))
 
             x = downsample_block(x, self._params['TRAINING'],
                                  batch_norm=True,
                                  name="downsample_postmerge{0}".format(i))
+
+            for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
+                x = residual_block(x, self._params['TRAINING'],
+                    batch_norm=True, name="resblock_postmerge_{0}_{1}".format(i, j))
 
         if verbose:
             print "Shape after final block: " + str(x.get_shape())

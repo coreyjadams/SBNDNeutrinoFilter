@@ -160,22 +160,22 @@ def downsample_block(input_tensor,
             # ReLU:
             x = tf.nn.relu(x)
 
-        # # Map the input tensor to the output tensor with a 1x1 convolution
-        # with tf.variable_scope(name+"identity"):
-        #     y = tf.layers.conv2d(input_tensor,
-        #                          n_filters,
-        #                          kernel_size=[1, 1],
-        #                          strides=[2, 2],
-        #                          padding='same',
-        #                          activation=None,
-        #                          use_bias=False,
-        #                          trainable=is_training,
-        #                          name="Conv2D1x1",
-        #                          reuse=reuse)
+        # Map the input tensor to the output tensor with a 1x1 convolution
+        with tf.variable_scope(name+"identity"):
+            y = tf.layers.conv2d(input_tensor,
+                                 n_filters,
+                                 kernel_size=[1, 1],
+                                 strides=[2, 2],
+                                 padding='same',
+                                 activation=None,
+                                 use_bias=False,
+                                 trainable=is_training,
+                                 name="Conv2D1x1",
+                                 reuse=reuse)
 
-        # # Sum the input and the output:
-        # with tf.variable_scope(name+"_add"):
-        #     x = tf.add(x, y)
+        # Sum the input and the output:
+        with tf.variable_scope(name+"_add"):
+            x = tf.add(x, y)
 
     return x
 
