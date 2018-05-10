@@ -1,0 +1,28 @@
+ProcessDriver: {
+  Verbosity:       2
+  EnableFilter:    false
+  RandomAccess:    0
+  RandomSeed:      0
+  ProcessType:     ["ApplyLabel"]
+  ProcessName:     ["ApplyLabel"]
+#  StartEntry:      0
+#  NumEntries:      5
+
+  IOManager: {
+    Verbosity:   2
+    Name:        "IOManager"
+    IOMode:      2
+    OutFileName: "out_neutrinos.root"
+    InputFiles:  []
+    InputDirs:   []
+    StoreOnlyType: ["image2d","particle"]
+    StoreOnlyName: ["sbndwire","eventlabel"]
+  }
+
+  ProcessList: {
+    ApplyLabel: {
+      OutputLabel: "eventlabel"
+      OutputID:    0
+    }
+  }
+}
