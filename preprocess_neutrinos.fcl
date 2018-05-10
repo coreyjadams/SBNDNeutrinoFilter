@@ -3,8 +3,8 @@ ProcessDriver: {
   EnableFilter:    false
   RandomAccess:    0
   RandomSeed:      0
-  ProcessType:     ["ApplyLabel"]
-  ProcessName:     ["ApplyLabel"]
+  ProcessType:     ["CompressAndEmbed","ApplyLabel"]
+  ProcessName:     ["CompressAndEmbed","ApplyLabel"]
 #  StartEntry:      0
 #  NumEntries:      5
 
@@ -20,6 +20,15 @@ ProcessDriver: {
   }
 
   ProcessList: {
+    CompressAndEmbed: {
+      Producer:          ["sbndwire"]
+      DataType:          ["image2d"]
+      RowCompression:    [1]
+      ColCompression:    [1]
+      Mode:              [0]
+      OutputCols:        [2048]
+      OutputRows:        [1280]
+    }
     ApplyLabel: {
       OutputLabel: "eventlabel"
       OutputID:    0
