@@ -82,7 +82,7 @@ class resnet_trainer(object):
                                            store_event_ids = (not self._config['TRAINING']))
             dim_data = self._dataloaders['test'].fetch_data(
                 self._config['TEST_CONFIG']['KEYWORD_DATA']).dim()
-            dim_label = self._dataloaders['train'].fetch_data(
+            dim_label = self._dataloaders['test'].fetch_data(
                 self._config['TEST_CONFIG']['KEYWORD_LABEL']).dim()
             end = time.time()
             sys.stdout.write("Time to start TEST IO: {0:.2}s\n".format(end - start))
@@ -100,7 +100,7 @@ class resnet_trainer(object):
                                           store_event_ids = (not self._config['TRAINING']))
             dim_data = self._dataloaders['ana'].fetch_data(
                 self._config['ANA_CONFIG']['KEYWORD_DATA']).dim()
-            dim_label = self._dataloaders['train'].fetch_data(
+            dim_label = self._dataloaders['ana'].fetch_data(
                 self._config['ANA_CONFIG']['KEYWORD_LABEL']).dim()
             # Output stream (optional)
             end = time.time()
