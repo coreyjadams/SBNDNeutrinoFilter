@@ -89,7 +89,7 @@ class resnetcore(object):
         with tf.name_scope('accuracy'):
             self._accuracy = tf.reduce_mean(
                     tf.cast(tf.equal(self._predicted_labels,
-                                     self._input_labels),
+                                     tf.argmax(self._input_labels,axis=-1)),
                             tf.float32))
 
             tf.summary.scalar("Accuracy",
