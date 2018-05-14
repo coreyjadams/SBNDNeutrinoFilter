@@ -147,11 +147,16 @@ class resnet(resnetcore):
                         p=p, i=i, s=x[p].get_shape())
 
                 # Add a bottleneck to prevent the number of layers from exploding:
+                n_current_filters = x[p].get_shape().as_list()[-1]
+                if n_current_filters > self._params['N_MAX_FILTERS']:
+                    n_filters = self._params['N_MAX_FILTERS']
+                else:
+                    n_filters = n_current_filters
                 name = "Bottleneck_downsample_{0}".format(i)
                 if not sharing:
                     name += "_plane{0}".format(p)
-                x = tf.layers.conv2d(x,
-                         n_max_filters,
+                x[p] = tf.layers.conv2d(x[p],
+                         n_filters,
                          kernel_size=[1,1],
                          strides=[1, 1],
                          padding='same',
