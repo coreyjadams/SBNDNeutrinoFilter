@@ -32,6 +32,7 @@ class resnetcore(object):
             'SAVE_ITERATION',
             'NUM_LABELS',
             'NPLANES',
+            'SHARE_PLANE_WEIGHTS',
             'N_INITIAL_FILTERS',
             'NETWORK_DEPTH_PRE_MERGE',
             'NETWORK_DEPTH_POST_MERGE',
