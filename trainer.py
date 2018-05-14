@@ -76,7 +76,10 @@ class resnet_trainer(object):
                             'verbosity'  : self._config['TEST_CONFIG']['VERBOSITY'],
                             'filler_cfg' : self._config['TEST_CONFIG']['FILE']}
             test_io.configure(test_io_cfg)
-            test_io.start_manager(self._config['MINIBATCH_SIZE'])
+            if 'TEST_MINIBATCH_SIZE' in self._config:
+                test_io.start_manager(self._config['TEST_MINIBATCH_SIZE'])
+            else:
+                test_io.start_manager(self._config['MINIBATCH_SIZE'])
             self._dataloaders.update({'test' : test_io})
             self._dataloaders['test'].next(store_entries   = (not self._config['TRAINING']),
                                            store_event_ids = (not self._config['TRAINING']))
@@ -267,7 +270,7 @@ class resnet_trainer(object):
             self._config['ANA_CONFIG']['KEYWORD_DATA']).data()
         batch_label  = self._dataloaders['ana'].fetch_data(
             self._config['ANA_CONFIG']['KEYWORD_LABEL']).data()
-       
+
 
         # reshape right here:
         batch_data = numpy.reshape(batch_data,
