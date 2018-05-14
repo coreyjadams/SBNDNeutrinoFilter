@@ -34,6 +34,7 @@ class resnetcore(object):
             'NPLANES',
             'SHARE_PLANE_WEIGHTS',
             'N_INITIAL_FILTERS',
+            'N_MAX_FILTERS',
             'NETWORK_DEPTH_PRE_MERGE',
             'NETWORK_DEPTH_POST_MERGE',
             'RESIDUAL_BLOCKS_PER_LAYER',

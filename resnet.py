@@ -175,8 +175,6 @@ class resnet(resnetcore):
         if verbose:
             print "Shape after concatenation: " + str(x.get_shape())
 
-        n_max_filters = self._params['NPLANES']*self._params['N_INITIAL_FILTERS']
-        n_max_filters *= 2**self._params['NETWORK_DEPTH_PRE_MERGE']
 
         # At the bottom, do another residual block:
         for i in xrange(self._params['NETWORK_DEPTH_POST_MERGE']):
@@ -192,14 +190,14 @@ class resnet(resnetcore):
             # Apply bottlenecking here to keep the number of filters in check:
 
             x = tf.layers.conv2d(x,
-                         n_max_filters,
+                         self._params['N_MAX_FILTERS'],
                          kernel_size=[1,1],
                          strides=[1, 1],
                          padding='same',
                          activation=None,
                          use_bias=False,
                          trainable=self._params['TRAINING'],
-                         name="Bottleneck_downsample_{0}".format(i))
+                         name="Bottleneck_downsample_merged_{0}".format(i))
 
         if verbose:
             print "Shape after final block: " + str(x.get_shape())
