@@ -203,7 +203,7 @@ class resnet_trainer(object):
         time_gpu += gpu_end - gpu_start
 
         # read-in test data set if needed
-        (test_data, test_label, test_weight) = (None,None,None)
+        (test_data, test_label) = (None,None)
         if (report_step or summary_step) and 'TEST_CONFIG' in self._config:
             self._dataloaders['test'].next()
             test_data   = self._dataloaders['test'].fetch_data(
@@ -228,7 +228,7 @@ class resnet_trainer(object):
             sys.stdout.write('Train set: ')
             self._report(numpy.mean(self._batch_metrics,axis=0),self._descr_metrics)
             if 'test' in self._dataloaders:
-                res,doc = self._net.run_test(self._sess, test_data, test_label, test_weight)
+                res,doc = self._net.run_test(self._sess, test_data, test_label)
                 sys.stdout.write('Test set: ')
                 self._report(res,doc)
             sys.stdout.write(" -- IO Time: {0:.2}s\t GPU Time: {1:.2}s\n".format(time_io, time_gpu))
@@ -267,7 +267,7 @@ class resnet_trainer(object):
             self._config['ANA_CONFIG']['KEYWORD_DATA']).data()
         batch_label  = self._dataloaders['ana'].fetch_data(
             self._config['ANA_CONFIG']['KEYWORD_LABEL']).data()
-        batch_weight = None
+       
 
         # reshape right here:
         batch_data = numpy.reshape(batch_data,
