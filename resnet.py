@@ -40,7 +40,7 @@ class resnet(resnetcore):
         x = input_placeholder
 
         # Initially, downsample by a factor of 2 to make the input data smaller:
-        x = tf.layers.average_pooling2d(inputs,
+        x = tf.layers.average_pooling2d(x,
                                         2,
                                         2,
                                         padding='same',
