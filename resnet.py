@@ -39,7 +39,18 @@ class resnet(resnetcore):
 
         x = input_placeholder
 
+        # Initially, downsample by a factor of 2 to make the input data smaller:
+        x = tf.layers.average_pooling2d(inputs,
+                                        2,
+                                        2,
+                                        padding='same',
+                                        name="InitialAveragePooling")
+
+
         # The filters are concatenated at some point, and progress together
+
+        if self._params['SHARE_PLANE_WEIGHTS']:
+          sharing = True
 
         verbose = True
 
@@ -54,14 +65,17 @@ class resnet(resnetcore):
 
         # Initial convolution to get to the correct number of filters:
         for p in range(len(x)):
+            name = "Conv2DInitial"
+            if not sharing:
+              name += "_plane{0}".format(p)
             x[p] = tf.layers.conv2d(x[p], self._params['N_INITIAL_FILTERS'],
                                     kernel_size=[7, 7],
                                     strides=[2, 2],
                                     padding='same',
                                     use_bias=False,
                                     trainable=self._params['TRAINING'],
-                                    name="Conv2DInitial_plane{0}".format(p),
-                                    reuse=None)
+                                    name=name,
+                                    reuse=sharing)
 
             # ReLU:
             x[p] = tf.nn.relu(x[p])
@@ -73,28 +87,63 @@ class resnet(resnetcore):
                 print "Plane {0}".format(p) + str(x[p].get_shape())
 
         for p in xrange(len(x)):
+          name = "initial_resblock1"
+          if not sharing:
+              name += "_plane{0}".format(p)
+
           x[p] = residual_block(x[p], self._params['TRAINING'],
                                       batch_norm=True,
-                                      name="initial_resblock1_plane{0}".format(p))
+                                      reuse=sharing,
+                                      name=name)
+          name = "initial_resblock2"
+          if not sharing:
+              name += "_plane{0}".format(p)
+
           x[p] = residual_block(x[p], self._params['TRAINING'],
                                       batch_norm=True,
-                                      name="initial_resblock2_plane{0}".format(p))
+                                      reuse=sharing,
+                                      name=name)
 
         # Begin the process of residual blocks and downsampling:
         for p in xrange(len(x)):
             for i in xrange(self._params['NETWORK_DEPTH_PRE_MERGE']):
 
+                name = "downsample_{0}".format(i)
+                if not sharing:
+                    name += "_plane{0}".format(p)
+
                 x[p] = downsample_block(x[p], self._params['TRAINING'],
                                         batch_norm=True,
-                                        name="downsample_plane{0}_{1}".format(p,i))
+                                        reuse=sharing,
+                                        name=name)
 
                 for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
+                    name = "resblock_{0}_{1}".format(i, j)
+                    if not sharing:
+                        name += "_plane{0}".format(p)
                     x[p] = residual_block(x[p], self._params['TRAINING'],
                                           batch_norm=True,
-                                          name="resblock_plane{0}_{1}_{2}".format(p, i, j))
+                                          reuse=sharing,
+                                          name=name)
                 if verbose:
                     print "Plane {p}, layer {i}: x[{p}].get_shape(): {s}".format(
                         p=p, i=i, s=x[p].get_shape())
+
+                # Add a bottleneck to prevent the number of layers from exploding:
+                name = "Bottleneck_downsample_{0}".format(i)
+                if not sharing:
+                    name += "_plane{0}".format(p)
+                x = tf.layers.conv2d(x,
+                         n_max_filters,
+                         kernel_size=[1,1],
+                         strides=[1, 1],
+                         padding='same',
+                         activation=None,
+                         use_bias=False,
+                         trainable=self._params['TRAINING'],
+                         reuse=sharing,
+                         name=name)
+
 
         # print "Reached the deepest layer."
 
