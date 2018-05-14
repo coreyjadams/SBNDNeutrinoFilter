@@ -65,9 +65,15 @@ class resnet(resnetcore):
 
         # Initial convolution to get to the correct number of filters:
         for p in range(len(x)):
+
             name = "Conv2DInitial"
             if not sharing:
               name += "_plane{0}".format(p)
+            # Only reuse on the non-first times through:
+            if p == 0:
+              reuse = False
+            else:
+              reuse = sharing
             x[p] = tf.layers.conv2d(x[p], self._params['N_INITIAL_FILTERS'],
                                     kernel_size=[7, 7],
                                     strides=[2, 2],
@@ -75,7 +81,7 @@ class resnet(resnetcore):
                                     use_bias=False,
                                     trainable=self._params['TRAINING'],
                                     name=name,
-                                    reuse=sharing)
+                                    reuse=reuse)
 
             # ReLU:
             x[p] = tf.nn.relu(x[p])
@@ -91,9 +97,15 @@ class resnet(resnetcore):
           if not sharing:
               name += "_plane{0}".format(p)
 
+          # Only reuse on the non-first times through:
+          if p == 0:
+            reuse = False
+          else:
+            reuse = sharing
+
           x[p] = residual_block(x[p], self._params['TRAINING'],
                                       batch_norm=True,
-                                      reuse=sharing,
+                                      reuse=reuse,
                                       name=name)
           name = "initial_resblock2"
           if not sharing:
@@ -101,7 +113,7 @@ class resnet(resnetcore):
 
           x[p] = residual_block(x[p], self._params['TRAINING'],
                                       batch_norm=True,
-                                      reuse=sharing,
+                                      reuse=reuse,
                                       name=name)
 
         # Begin the process of residual blocks and downsampling:
@@ -111,10 +123,15 @@ class resnet(resnetcore):
                 name = "downsample_{0}".format(i)
                 if not sharing:
                     name += "_plane{0}".format(p)
+                # Only reuse on the non-first times through:
+                if p == 0:
+                  reuse = False
+                else:
+                  reuse = sharing
 
                 x[p] = downsample_block(x[p], self._params['TRAINING'],
                                         batch_norm=True,
-                                        reuse=sharing,
+                                        reuse=reuse,
                                         name=name)
 
                 for j in xrange(self._params['RESIDUAL_BLOCKS_PER_LAYER']):
@@ -123,7 +140,7 @@ class resnet(resnetcore):
                         name += "_plane{0}".format(p)
                     x[p] = residual_block(x[p], self._params['TRAINING'],
                                           batch_norm=True,
-                                          reuse=sharing,
+                                          reuse=reuse,
                                           name=name)
                 if verbose:
                     print "Plane {p}, layer {i}: x[{p}].get_shape(): {s}".format(
@@ -141,7 +158,7 @@ class resnet(resnetcore):
                          activation=None,
                          use_bias=False,
                          trainable=self._params['TRAINING'],
-                         reuse=sharing,
+                         reuse=reuse,
                          name=name)
 
 
